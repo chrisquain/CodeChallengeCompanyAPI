@@ -1,0 +1,50 @@
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Company]') AND type in (N'U'))
+DROP TABLE [dbo].[Company]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[Company](
+	[CompanyID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] varchar(100) NOT NULL,
+	[Exchange] varchar(100) NOT NULL,
+	[ISIN] varchar(255) NOT NULL,
+	[Ticker] varchar(100) NOT NULL,
+	[Website] varchar(255)
+	CONSTRAINT [PK_Company] PRIMARY KEY CLUSTERED
+(
+	[CompanyID] ASC
+)WITH
+(
+	PAD_INDEX = OFF
+	,STATISTICS_NORECOMPUTE = OFF
+	,IGNORE_DUP_KEY = OFF
+	,ALLOW_ROW_LOCKS = ON
+	,ALLOW_PAGE_LOCKS = ON
+) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Company]
+ADD CONSTRAINT Unique_ISIN_Version UNIQUE([ISIN])
+
+
+ALTER TABLE [dbo].[Company]
+ADD CONSTRAINT Aplhanumeric_ISIN_Contraint CHECK(SUBSTRING([ISIN], 1, 1) LIKE '%[A-Z]%' AND SUBSTRING([ISIN], 2, 2) LIKE '%[A-Z]%' )
+
+CREATE NONCLUSTERED INDEX [IX_Company_CompanyID] ON [dbo].[Company]
+(
+	[CompanyID] ASC
+)WITH (FILLFACTOR=90)ON [PRIMARY]
+GO
+
+CREATE NONCLUSTERED INDEX [IX_Company_ISIN] ON [dbo].[Company]
+(
+	[ISIN] ASC
+)WITH (FILLFACTOR=90)ON [PRIMARY]
+GO
